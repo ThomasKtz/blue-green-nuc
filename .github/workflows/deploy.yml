@@ -1,0 +1,22 @@
+name: Deploy blue-green
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rejoindre le tailnet
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+
+      - name: Lancer la bascule sur le NUC
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.NUC_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh -o StrictHostKeyChecking=accept-new thomas@100.112.91.34
